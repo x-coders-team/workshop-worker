@@ -1,0 +1,39 @@
+version: '3.1'
+
+services:
+  workshop-woker-service:
+    container_name: workshop-woker-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      APP_ENV: local
+      APP_SECRET: 62c42a01d8bbfcdc0a78a6817b58c305
+    ports:
+      - "9090:80"
+      - "9191:8080"
+    networks:
+      - workshop-network
+    volumes:
+      - ${pwd}:/var/www/web-server/
+
+  workshop-rabbitmq:
+    container_name: workshop-rabbitmq
+    image: rabbitmq:3.9.22-management
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq_admin
+      RABBITMQ_DEFAULT_PASS: rabbitmq
+    ports:
+      - "9292:15672"
+      - "5672:5672"
+    networks:
+      - workshop-network
+
+
+
+
+networks:
+  workshop-network:
+    driver: bridge
