@@ -31,9 +31,6 @@ services:
     networks:
       - workshop-network
 
-
-
-
 networks:
   workshop-network:
     driver: bridge
