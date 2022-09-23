@@ -8,8 +8,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get -yqq update && apt-get --no-install-recommends -yqq install nginx curl \
     php8.1 php8.1-cli php8.1-fpm \
     php8.1-pdo php8.1-mysql php8.1-mongodb php8.1-pgsql \
-    php8.1-curl php8.1-zip php8.1-curl php8.1-xml php8.1-bcmath php8.1-xmlrpc php8.1-gd php8.1-mbstring\
-    mc nano wget sudo\
+    php8.1-curl php8.1-zip php8.1-curl php8.1-xml php8.1-bcmath php8.1-xmlrpc php8.1-gd php8.1-mbstring php8.1-amqp\
+    mc nano wget sudo supervisor python3 python3-pip \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
 
@@ -21,10 +21,13 @@ COPY ./docker/nginx/sites-available /etc/nginx/sites-available/
 COPY ./docker/nginx/sites-available /etc/nginx/sites-enabled/
 COPY ./docker/nginx/snippets /etc/nginx/snippets/
 COPY ./docker/entrypoint.sh /etc/entrypoint.sh
+COPY docker/setup-supervisor.sh /scripts/setup-supervisor.sh
+COPY docker/supervisor/conf.d/messenger-worker.conf /etc/supervisor/conf.d/messenger-worker.conf
 
 FROM setup_service as setup_sudo_access
 
-RUN sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g' && \
+RUN chmod 0755 -R /scripts/*.sh; \
+    sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g' && \
     sed -i /etc/sudoers -re 's/^root.*/root ALL=(ALL:ALL) NOPASSWD: ALL/g' && \
     sed -i /etc/sudoers -re 's/^#includedir.*/## **Removed the include directive** ##"/g' && \
     echo "www-data ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \

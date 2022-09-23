@@ -1,5 +1,4 @@
 #!/bin/bash
-
 sudo chmod -R 777 /var/www/
 
 if [ "$APP_ENV" == "local" ]
@@ -18,5 +17,7 @@ else
 fi
 
 composer dump-env $APP_ENV
+
+/scripts/setup-supervisor.sh
 
 sudo service php8.1-fpm start && sudo nginx -g 'daemon off;'
